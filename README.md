@@ -39,3 +39,7 @@ Set Custom Message to show to the user.
 **Sample Screenshot:**
 
 ![AndroidAppForceUpdate](https://github.com/SamaGyani/ForceUpdateApp/blob/master/sample.png)
+
+**Note:**
+1. This library will work only when the application is connected to the internet.<br>
+2. Internet permissions are already added to the library manifest file.<br>
