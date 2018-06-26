@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
         ForceUpdate forceUpdate = new ForceUpdate(MainActivity.this);
         forceUpdate.setCanceledOnTouchOutside(false);
+        forceUpdate.setCancelable(false);
         forceUpdate.setTitle("New Update Available");
         forceUpdate.setMessage("Download this Update for New Features");
         forceUpdate.build();

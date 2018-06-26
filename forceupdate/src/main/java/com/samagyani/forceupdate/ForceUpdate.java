@@ -26,15 +26,14 @@ import java.io.IOException;
 public class ForceUpdate {
 
     private Context context;
-    private double versionName= Double.valueOf(BuildConfig.VERSION_NAME);
-    private double playStoreVersionName;
+    private String versionName = BuildConfig.VERSION_NAME;
+    private String playStoreVersionName;
     private boolean cancelable = false;
     private boolean cancelableTouchOutSide = false;
     private CharSequence titleText = "Update Available";
     private String messageText = "An Update is Available With New Features";
 
-    public ForceUpdate(Context context){
-
+    public ForceUpdate(Context context) {
         this.context = context;
     }
 
@@ -44,7 +43,7 @@ public class ForceUpdate {
     }
 
 
-    public void setCanceledOnTouchOutside(boolean cancelableTouchOutSide ) {
+    public void setCanceledOnTouchOutside(boolean cancelableTouchOutSide) {
         this.cancelableTouchOutSide = cancelableTouchOutSide;
     }
 
@@ -57,21 +56,19 @@ public class ForceUpdate {
     }
 
 
-    public void build(){
-
-
+    public void build() {
 
         LoadUrl loadUrl = new LoadUrl();
         loadUrl.execute();
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class LoadUrl extends AsyncTask<Void,Void,Void> {
+    private class LoadUrl extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
 
-            if (!isConnectivityOk()){
+            if (!isConnectivityOk()) {
                 this.cancel(true);
                 return;
             }
@@ -84,16 +81,26 @@ public class ForceUpdate {
 
             try {
 
-                Document doc = Jsoup.connect(getUrl())
-                        .userAgent("Mozilla/4.0")
-                        .referrer("https://www.google.com")
-                        .timeout(30000)
-                        .get();
+                //Document doc = Jsoup.connect(getUrl())
+                //        .userAgent("Mozilla/4.0")
+                //        .referrer("https://www.google.com")
+                //        .timeout(30000)
+                //        .get();
+                /////String ver = doc.select("span[class=htlgb]").text();
+                //String ver = doc.select("span[class=htlgb]").get(6).text();
 
-                ///String ver = doc.select("span[class=htlgb]").text();
-                String ver = doc.select("span[class=htlgb]").get(6).text();
+                //String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=" + context.getPackageName() + "&hl=it")    // this is original
+                String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=com.yptech.privategallery&hl=it") // for my testing purpose
+                        .timeout(30000)
+                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .referrer("http://www.google.com")
+                        .get()
+                        .select(".hAyfc .htlgb")
+                        .get(7)
+                        .ownText();
+
                 Log.e("From Playstore ", ver);
-                playStoreVersionName = Double.valueOf(ver);
+                playStoreVersionName = ver;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -104,18 +111,49 @@ public class ForceUpdate {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (playStoreVersionName>versionName){
+            //if (playStoreVersionName > versionName) {
+            //    Log.e("Current Version", String.valueOf(versionName));
+            //    Log.e("Update Version", String.valueOf(playStoreVersionName));
+            //    showUpdateDialog();
+            //} else {
+            //    Log.e("No Update Available", "Current Version: " + String.valueOf(playStoreVersionName));
+            //}
+
+            if (versionCompare(playStoreVersionName, versionName)) {
                 Log.e("Current Version", String.valueOf(versionName));
                 Log.e("Update Version", String.valueOf(playStoreVersionName));
                 showUpdateDialog();
-            }else{
-                Log.e("No Update Available", "Current Version: "+String.valueOf(playStoreVersionName));
+            } else {
+                Log.e("No Update Available", "Current Version: " + String.valueOf(playStoreVersionName));
             }
         }
     }
 
-    private String getUrl(){
-        return "https://play.google.com/store/apps/details?id="+context.getPackageName();
+    private boolean versionCompare(String NewVersion, String OldVersion) {
+        String[] vals1 = NewVersion.split("\\.");
+        String[] vals2 = OldVersion.split("\\.");
+        try {
+            int i = 0;
+            // set index to first non-equal ordinal or length of shortest version string
+            while (i < vals1.length && i < vals2.length && vals1[i].equals(vals2[i])) {
+                i++;
+            }
+            // compare first non-equal ordinal number
+            if (i < vals1.length && i < vals2.length) {
+                int diff = Integer.valueOf(vals1[i]).compareTo(Integer.valueOf(vals2[i]));
+                return Integer.signum(diff) > 0;
+            }
+            // the strings are equal or one string is a substring of the other
+            // e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
+            return Integer.signum(vals1.length - vals2.length) > 0;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getUrl() {
+        return "https://play.google.com/store/apps/details?id=" + context.getPackageName();
     }
 
     private void showUpdateDialog() {
@@ -126,7 +164,7 @@ public class ForceUpdate {
 
         TextView title = updateDialog.findViewById(R.id.title);
         TextView message = updateDialog.findViewById(R.id.message);
-        ImageView updateIcon  = updateDialog.findViewById(R.id.update_icon);
+        ImageView updateIcon = updateDialog.findViewById(R.id.update_icon);
         updateIcon.setImageResource(android.R.drawable.ic_dialog_info);
 
         title.setText(titleText);
@@ -134,14 +172,14 @@ public class ForceUpdate {
 
         GradientDrawable updateShape = new GradientDrawable();
         updateShape.setColor(context.getResources().getColor(android.R.color.holo_green_dark));
-        updateShape.setCornerRadii(new float[]{10f,10f,10f,10f,10f,10f,10f,10f});
+        updateShape.setCornerRadii(new float[]{10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f});
 
         Button updateButton = updateDialog.findViewById(R.id.updateButton);
         updateButton.setBackground(updateShape);
 
         GradientDrawable ignoreShape = new GradientDrawable();
         ignoreShape.setColor(context.getResources().getColor(android.R.color.holo_red_dark));
-        ignoreShape.setCornerRadii(new float[]{10f,10f,10f,10f,10f,10f,10f,10f});
+        ignoreShape.setCornerRadii(new float[]{10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f});
 
         Button ignoreButton = updateDialog.findViewById(R.id.ignoreButton);
         ignoreButton.setBackground(ignoreShape);
