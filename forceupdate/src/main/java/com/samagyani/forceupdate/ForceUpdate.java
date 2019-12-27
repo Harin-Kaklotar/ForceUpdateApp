@@ -81,16 +81,8 @@ public class ForceUpdate {
 
             try {
 
-                //Document doc = Jsoup.connect(getUrl())
-                //        .userAgent("Mozilla/4.0")
-                //        .referrer("https://www.google.com")
-                //        .timeout(30000)
-                //        .get();
-                /////String ver = doc.select("span[class=htlgb]").text();
-                //String ver = doc.select("span[class=htlgb]").get(6).text();
-
-                //String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=" + context.getPackageName() + "&hl=it")    // this is original
-                String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=com.yptech.privategallery&hl=it") // for my testing purpose
+                //String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=com.snapchat.android&hl=it") // for testing purpose
+                String ver = Jsoup.connect("https://play.google.com/store/apps/details?id=" + context.getPackageName() + "&hl=it")
                         .timeout(30000)
                         .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                         .referrer("http://www.google.com")
@@ -99,7 +91,7 @@ public class ForceUpdate {
                         .get(7)
                         .ownText();
 
-                Log.e("From Playstore ", ver);
+                Log.d("From Playstore ", ver);
                 playStoreVersionName = ver;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -120,11 +112,11 @@ public class ForceUpdate {
             //}
 
             if (versionCompare(playStoreVersionName, versionName)) {
-                Log.e("Current Version", String.valueOf(versionName));
-                Log.e("Update Version", String.valueOf(playStoreVersionName));
+                Log.d("Current Version", String.valueOf(versionName));
+                Log.d("Update Version", String.valueOf(playStoreVersionName));
                 showUpdateDialog();
             } else {
-                Log.e("No Update Available", "Current Version: " + String.valueOf(playStoreVersionName));
+                Log.d("No Update Available", "Current Version: " + String.valueOf(playStoreVersionName));
             }
         }
     }
